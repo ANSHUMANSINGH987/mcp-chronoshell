@@ -1,0 +1,21 @@
+[project]
+name = "mcp-chronoshell"
+version = "0.1.0"
+description = "A state-reverting terminal MCP that gives AI agents an undo button for local file operations."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Anshuman Singh" }
+]
+dependencies = [
+    "fastmcp>=1.0.0",
+    "pydantic>=2.0.0"
+]
+
+[project.scripts]
+# This exposes the CLI command when users pip/uv install your package
+mcp-chronoshell = "mcp_chronoshell.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

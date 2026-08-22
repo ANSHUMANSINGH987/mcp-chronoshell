@@ -1,0 +1,27 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Build and distribution artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# FastMCP / Local Configuration
+mcp.json
+fastmcp.json
+
+# Project Specific
+.chronoshell_snapshots/
+
+# OS specific
+.DS_Store

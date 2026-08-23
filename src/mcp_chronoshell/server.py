@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
 # Initialize the FastMCP server
-mcp = FastMCP("Chronoshell", dependencies=["pydantic"])
+mcp = FastMCP("Chronoshell")
 
 @mcp.tool()
 def run_safe_command(

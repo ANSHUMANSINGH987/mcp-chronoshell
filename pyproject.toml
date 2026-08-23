@@ -1,6 +1,6 @@
 [project]
 name = "mcp-chronoshell"
-version = "0.1.0"
+version = "0.1.1"
 description = "A state-reverting terminal MCP that gives AI agents an undo button for local file operations."
 readme = "README.md"
 requires-python = ">=3.10"

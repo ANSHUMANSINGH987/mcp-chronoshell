@@ -16,6 +16,8 @@ The safety net for autonomous AI agents.
 
 `mcp-chronoshell` is a Model Context Protocol (MCP) server that grants AI agents the ability to execute terminal commands with a built-in "Undo Button." By utilizing hyper-fast, state-reverting snapshots, agents can safely write code, manipulate files, and run scripts without the risk of permanently breaking your local workspace.
 
+<video src="assets/recording.mp4" autoplay loop muted playsinline width="100%"></video>
+
 ## 🧠 How It Works: The Snapshot Architecture
 
 When an agent is connected to Chronoshell, it gains access to a safe execution loop. The server exposes three primary tools to the LLM:

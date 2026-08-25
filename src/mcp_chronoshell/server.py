@@ -106,9 +106,13 @@ async def revert_workspace() -> dict:
     if not os.path.exists(SNAPSHOT_DIR):
         raise ToolError("No snapshots found. Cannot revert.")
         
-    snapshots = sorted(os.listdir(SNAPSHOT_DIR))
+    snapshots = sorted([
+        d for d in os.listdir(SNAPSHOT_DIR) 
+        if os.path.isdir(os.path.join(SNAPSHOT_DIR, d))
+    ])
+    
     if not snapshots:
-        raise ToolError("Snapshot directory is empty. Cannot revert.")
+        raise ToolError("Snapshot directory is empty or contains no valid snapshots. Cannot revert.")
         
     latest_snapshot = snapshots[-1]
     snapshot_path = os.path.join(SNAPSHOT_DIR, latest_snapshot)

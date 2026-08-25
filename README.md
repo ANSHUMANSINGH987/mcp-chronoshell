@@ -1,117 +1,83 @@
-<h1 align="center">⏳ MCP Chronoshell</h1>
+# 🛡️ mcp-chronoshell
 
-<p align="center">
-  <strong>A state-reverting terminal MCP that gives AI agents an "undo button" for local file operations.</strong>
-</p>
+[![PyPI version](https://img.shields.io/pypi/v/mcp-chronoshell.svg)](https://pypi.org/project/mcp-chronoshell/)
+[![Python versions](https://img.shields.io/pypi/pyversions/mcp-chronoshell.svg)](https://pypi.org/project/mcp-chronoshell/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<p align="center">
-  <a href="https://pypi.org/project/mcp-chronoshell/"><img src="https://img.shields.io/pypi/v/mcp-chronoshell.svg" alt="PyPI version"></a>
-  <a href="https://pypi.org/project/mcp-chronoshell/"><img src="https://img.shields.io/pypi/pyversions/mcp-chronoshell.svg" alt="Python Versions"></a>
-  <a href="https://github.com/"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
-  <a href="https://pypi.org/project/fastmcp/"><img src="https://img.shields.io/badge/Powered%20by-FastMCP-ff69b4.svg" alt="Powered by FastMCP"></a>
-</p>
+**The safety net for autonomous AI agents.**
 
----
+`mcp-chronoshell` is a Model Context Protocol (MCP) server that grants AI agents the ability to execute terminal commands with a built-in "Undo Button." By utilizing hyper-fast, state-reverting snapshots, agents can safely write code, manipulate files, and run scripts without the risk of permanently breaking your local workspace.
 
-## 🚀 The Problem
+## 🧠 How It Works: The Snapshot Architecture
 
-Giving an autonomous agent access to your local terminal is risky. One hallucinated `rm -rf`, a malformed `sed` command, or a botched configuration change can break your workspace. While Docker-based sandboxes provide security isolation, they prevent the agent from actually helping you build software on your local host (like running `uv add`, modifying `settings.py`, or refactoring your repository).
+When an agent is connected to Chronoshell, it gains access to a safe execution loop. The server exposes three primary tools to the LLM:
 
-## 💡 The Solution
+1. 📸 **`run_safe_command` (The Executor):** Before executing a shell command, the server takes a millisecond-fast snapshot of the current working directory, ignoring heavy directories (e.g., `node_modules`, `.venv`, `.git`).
+2. ⏪ **`revert_workspace` (The Undo Button):** If the command exits with an error or causes unintended side effects, the agent can call this tool to instantly roll the directory back to its exact previous state.
+3. 🗑️ **`commit_workspace` (The Garbage Collector):** If the command succeeds and the agent validates the output, it calls this tool to clear the snapshot cache and save disk space.
 
-**MCP Chronoshell** acts as a wrapper around standard terminal execution. Before executing any command, it takes a hyper-fast snapshot of your current working directory (intelligently ignoring heavy folders like `node_modules`, `.venv`, and `.git`). 
+## ✨ Core Optimizations & Safety
 
-If the agent makes a mistake, it can invoke a `revert_workspace` tool to instantly time-travel back to the pre-execution state. 
+* **Zero-Latency Backups:** Uses hardcoded blocklists and OS-level I/O optimizations to take snapshots in milliseconds, preventing the LLM from timing out.
+* **Concurrent Multi-Agent Safety:** Injects cryptographic UUIDs into snapshot IDs, guaranteeing race-condition safety when multiple agents invoke commands simultaneously.
+* **Smart Symlink Evasion:** Dynamically sniffs out and bypasses Windows Junctions and Reparse points to prevent infinite-loop crashes.
+* **Actionable Error Routing:** Captures OS-level permission denials and `STDERR` outputs, routing them directly back into the LLM's context window so it can learn and adapt.
 
-It provides **productivity with a safety net**.
+## 🚀 Installation
 
----
-
-## ⚡ Features
-
-- **Safe Execution (`run_safe_command`)**: Wraps every command in a pre-execution snapshot.
-- **Instant Rollbacks (`revert_workspace`)**: Undoes accidental deletions, broken code edits, or bad package installs.
-- **Context-Aware Outputs**: Structures `stdout` and `stderr` specifically for LLM consumption.
-- **Hyper-Fast I/O Engine**: Utilizes $O(1)$ set lookups to ignore heavy, reproducible directories so snapshots take milliseconds.
-- **Cross-Platform**: Works flawlessly on Windows, macOS, Linux, and WSL environments.
-
----
-
-## 📦 Installation
-
-Since MCP Chronoshell is published on PyPI, installation is trivial. It is highly recommended to use `uv` for lightning-fast installation, but standard `pip` works perfectly as well.
+You can run `mcp-chronoshell` instantly via `uv` (recommended) or install it globally using `pip`:
 
 ```bash
 # Using uv (Recommended)
-uv tool install mcp-chronoshell
+uvx mcp-chronoshell
 
 # Using pip
 pip install mcp-chronoshell
 ```
 
----
+## 🔌 Connecting to AI Clients
 
-## 🛠️ Configuration (Claude Desktop)
+### 1. Google Antigravity (Workspace Local)
 
-To use Chronoshell with Claude Desktop, you need to add it to your MCP client configuration. 
-
-Open your Claude Desktop configuration file:
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-Add the following JSON block. Make sure to update the `command` path to point to where Python or `uv` is installed on your machine.
+To give a specific Antigravity project access to the safety net, create a `.agents/mcp_config.json` file in the root of your project:
 
 ```json
 {
   "mcpServers": {
     "chronoshell": {
-      "command": "mcp-chronoshell",
-      "args": []
+      "command": "uvx",
+      "args": ["mcp-chronoshell"]
     }
   }
 }
 ```
-*Note: If `mcp-chronoshell` is not in your global system PATH, provide the absolute path to your python executable or uv binary, and pass `["-m", "mcp_chronoshell.server"]` as the arguments.*
 
----
+### 2. Claude Desktop (Global)
 
-## 🧰 Available Agent Tools
+Add the server to your Claude Desktop configuration file:
 
-Once connected, your AI agent will have access to the following native tools:
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+- **Mac:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-1. `run_safe_command(command: str)`
-   Executes a shell command safely. Automatically creates a state-revert snapshot before execution. It prevents hanging by enforcing a 120-second timeout.
-   
-2. `revert_workspace()`
-   Reverts the local directory to the exact state it was in before the last `run_safe_command` was executed. The agent is instructed to call this immediately if a command caused unintended side effects.
-   
-3. `commit_workspace()`
-   Clears the snapshot cache (`.chronoshell_snapshots/`) to save disk space. Called when the agent verifies the previous commands succeeded.
+```json
+{
+  "mcpServers": {
+    "chronoshell": {
+      "command": "uvx",
+      "args": ["mcp-chronoshell"]
+    }
+  }
+}
+```
 
----
+### 3. Custom LangChain / Python Agents
 
-## 🏗️ Architecture Under the Hood
-
-Chronoshell is built entirely in Python using **FastMCP**, meaning it requires zero external dependencies like Docker or Redis. 
-- It uses Python's `shutil.copytree` with `dirs_exist_ok=True` (introduced in Python 3.8) to act as a highly efficient overwrite/merge mechanism.
-- Snapshots are stored locally in a hidden `.chronoshell_snapshots` directory.
-- A hardcoded blocklist ensures that $I/O$ bottlenecks (like `__pycache__` or `node_modules`) are strictly ignored during the snapshot phase, preserving terminal speed.
-
----
+Chronoshell is fully compatible with `langchain-mcp-adapters`. Simply initialize the `StdioServerParameters` pointing to the `uvx` command to bind the tools to your custom ReAct or LangGraph agents.
 
 ## 🤝 Contributing
 
-Contributions are welcome! If you want to optimize the snapshot engine (e.g., implementing an optional Git-based snapshot mode) or add new terminal capabilities:
+Contributions are welcome! If you have ideas for new features, performance optimizations, or find a bug, please open an issue or submit a pull request.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## 📄 License
 
----
-
-## 📝 License & Author
-
-**Author:** Anshuman Singh  
-**License:** Distributed under the MIT License. See `LICENSE` for more information.
+This project is licensed under the MIT License.

@@ -2,8 +2,6 @@
 
 # 🛡️ mcp-chronoshell
 
-![Chronoshell Demo](assets/demo.gif)
-
 The safety net for autonomous AI agents.
 
 [![PyPI version](https://img.shields.io/pypi/v/mcp-chronoshell.svg)](https://pypi.org/project/mcp-chronoshell/)

@@ -3,14 +3,11 @@ import time
 import logging
 from pathlib import Path
 
-# Configure module-level logging
 logger = logging.getLogger(__name__)
 
-# Constants for snapshot management
 SNAPSHOT_BASE_DIR = Path(".chronoshell_snapshots")
 STATE_FILE = SNAPSHOT_BASE_DIR / "latest.txt"
 
-# Directories we absolutely DO NOT want to back up (I/O bottlenecks)
 IGNORE_DIRS = {
     '.git', '.venv', 'venv', 'env', 'node_modules', 
     '__pycache__', '.pytest_cache', '.tox', 
@@ -33,7 +30,6 @@ def take_snapshot() -> str:
     """
     SNAPSHOT_BASE_DIR.mkdir(exist_ok=True)
     
-    # Use high-precision timestamp for the ID
     snapshot_id = str(int(time.time() * 1000))
     target_dir = SNAPSHOT_BASE_DIR / snapshot_id
     
@@ -66,7 +62,6 @@ def restore_latest_snapshot() -> tuple[bool, str]:
     logger.warning(f"Reverting workspace to snapshot: {snapshot_id}")
     
     try:
-        # Restore files. dirs_exist_ok=True ensures we overwrite existing modified files
         shutil.copytree(snapshot_path, ".", ignore=_ignore_heavy_dirs, dirs_exist_ok=True)
         return True, snapshot_id
     except Exception as e:

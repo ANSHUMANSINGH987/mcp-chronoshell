@@ -2,10 +2,6 @@
 
 # 🛡️ mcp-chronoshell
 
-![Chronoshell Demo](assets/demo.gif)
-
-The safety net for autonomous AI agents.
-
 [![PyPI version](https://img.shields.io/pypi/v/mcp-chronoshell.svg)](https://pypi.org/project/mcp-chronoshell/)
 [![Python versions](https://img.shields.io/pypi/pyversions/mcp-chronoshell.svg)](https://pypi.org/project/mcp-chronoshell/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -16,7 +12,7 @@ The safety net for autonomous AI agents.
 
 `mcp-chronoshell` is a Model Context Protocol (MCP) server that grants AI agents the ability to execute terminal commands with a built-in "Undo Button." By utilizing hyper-fast, state-reverting snapshots, agents can safely write code, manipulate files, and run scripts without the risk of permanently breaking your local workspace.
 
-<video src="assets/recording.mp4" autoplay loop muted playsinline width="100%"></video>
+![Chronoshell Demo](assets/demo.gif)
 
 ## 🧠 How It Works: The Snapshot Architecture
 

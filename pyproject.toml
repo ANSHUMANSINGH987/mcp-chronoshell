@@ -13,7 +13,6 @@ dependencies = [
 ]
 
 [project.scripts]
-# This exposes the CLI command when users pip/uv install your package
 mcp-chronoshell = "mcp_chronoshell.server:main"
 
 [build-system]
